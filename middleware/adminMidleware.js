@@ -1,9 +1,13 @@
-const Admin = async (req,res,next)=>{
-    if(req.user && req.user.role === 'Admin'){
-        res.status(200).json({message:"AdMIN SUCCESSFULY LOGIN"})
-        next()
-    }else{
-        res.status(400).json({message:"your not login"})
-    }
-}
-export default Admin
+
+const Admin = async (req, res, next) => {
+  if (req.user && req.user.role === "Admin") {
+    next();
+  } else {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied. Admin only."
+    });
+  }
+};
+
+export default Admin;

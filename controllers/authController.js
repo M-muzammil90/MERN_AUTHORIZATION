@@ -3,13 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sandEmail from "../utils/SandEmail.js";
 
+const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
 const Register = async (req, res) => {
   const GenerateToken = async (id) => {
-    return jwt.sign(
-      { id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
   };
 
   try {
@@ -36,9 +36,7 @@ const Register = async (req, res) => {
     });
 
     // Generate OTP
-    const OTP = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
+    const OTP = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Email message
     const message = `
@@ -50,11 +48,7 @@ Your OTP Code is: ${OTP}
 `;
 
     // Send email
-    await sandEmail(
-      email,
-      "THANKS FOR VISITING Muzenix",
-      message
-    );
+    await sandEmail(email, "THANKS FOR VISITING Muzenix", message);
 
     // Generate JWT
     const Token = await GenerateToken(user._id);
@@ -68,7 +62,6 @@ Your OTP Code is: ${OTP}
       role: user.role,
       Token,
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -78,38 +71,54 @@ Your OTP Code is: ${OTP}
   }
 };
 const Login = async (req, res) => {
-try {
-      const { email, password } = req.body;
-      const user = User.findOne({ email });
-      if (!user) {
-      return  res.status(400).json({ message: "email all ready exsite " });
-      }
-      const comparepass = bcrypt.compare(password, user.password);
-    
-        const options = {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          Token: GenrateToken(user._id),
-        };
-       return res.status(200).json({
-          message: "your login successfuy",
-          options,
-        });
-      
-} catch (error) {
-  return  res.status(500).json({message:"server error data is not found",error})
-}
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "email all ready exsite " });
+    }
+    const comparepass = await bcrypt.compare(password, user.password);
+    if (!comparepass) {
+      return res.status(400).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    const options = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+     Token: generateToken(user._id),
+    };
+    return res.status(200).json({
+      message: "your login successfuy",
+      options,
+    });
+  } catch (error) {
+    console.log("LOGIN ERROR:", error);
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
 };
 
-const GetALLuser = async (req,res)=>{
+const GetALLuser = async (req, res) => {
   try {
-     const alluser = await User.findOne({}).select('-password')
-     res.json(alluser)
+    const alluser = await User.find({}).select("-password");
+
+    return res.status(200).json({
+      message: "All users fetched successfully",
+      users: alluser,
+    });
   } catch (error) {
-    res.status(500).json({message:"user is not found"})
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Users are not found",
+      error: error.message,
+    });
   }
-   
-}
-export {Register,Login,GetALLuser};
+};
+export { Register, Login, GetALLuser };
