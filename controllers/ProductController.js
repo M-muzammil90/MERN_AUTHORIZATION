@@ -36,7 +36,8 @@ const CreateProduct = async (req, res) => {
       price,
       category,
       stock,
-       images: ImageUrl,}
+       images: ImageUrl,
+      }
     );
 
     const saveProduct = await NewProduct.save();
