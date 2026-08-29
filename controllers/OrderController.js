@@ -45,18 +45,13 @@ ${adress.Countery}
 
 Payment ID: ${paymentId}`;
 
-    await sendEmail(
-      req.user.email,
-      "Order Created Successfully",
-      message
-    );
+    await sendEmail(req.user.email, "Order Created Successfully", message);
 
     return res.status(201).json({
       success: true,
       message: "Your order successfully created",
       order,
     });
-
   } catch (error) {
     console.error("CreateOrder Error:", error);
 
@@ -68,24 +63,25 @@ Payment ID: ${paymentId}`;
   }
 };
 
-const myorders = async(req,res)=>{
-try {
-      const orders = await  Order.find({user:req.user._id})
-      res.json(orders)
-} catch (error) {
-    res.status(500).json({message:"myorder server error",error})
-}
-}
-const adminGetOrder = async(req,res)=>{
-try {
-      const orders = await  Order.find({}).populate('user','Id name')
-      res.json(orders)
-} catch (error) {
-    res.status(500).json({message:"myorder server error",error})
-}
-}
+const myorders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "myorder server error", error });
+  }
+};
+const adminGetOrder = async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate("user", "Id name");
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "myorder server error", error });
+  }
+};
 
 const UpdateOrderStatus = async (req, res) => {
+
   try {
     const { status } = req.body;
 
@@ -114,7 +110,6 @@ const UpdateOrderStatus = async (req, res) => {
       message: "Order updated successfully",
       order,
     });
-
   } catch (error) {
     console.error("Update Order Error:", error);
 
@@ -125,4 +120,4 @@ const UpdateOrderStatus = async (req, res) => {
     });
   }
 };
-export {CreateOrder,myorders,adminGetOrder,UpdateOrderStatus}
+export { CreateOrder, myorders, adminGetOrder, UpdateOrderStatus };
