@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcrypt";
 import User from "./models/User.js";
 import Product from "./models/ProductModels.js";
 import DBconnection from "./config/index.js";
@@ -19,9 +19,9 @@ const seedData = async () => {
     console.log("✓ Cleared existing data");
 
     // Hash passwords
-    const hashedPassword1 = await bcryptjs.hash("user123", 10);
-    const hashedPassword2 = await bcryptjs.hash("admin123", 10);
-    const hashedPassword3 = await bcryptjs.hash("user456", 10);
+    const hashedPassword1 = await bcrypt.hash("user123", 10);
+    const hashedPassword2 = await bcrypt.hash("admin123", 10);
+    const hashedPassword3 = await bcrypt.hash("user456", 10);
 
     // Seed Users
     const users = [
